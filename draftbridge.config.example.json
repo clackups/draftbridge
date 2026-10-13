@@ -1,0 +1,24 @@
+{
+  "baseUrl": "https://draftbridge.example.com",
+  "host": "127.0.0.1",
+  "port": 8090,
+  "siteName": "Draftbridge",
+
+  "oauth": {
+    "github": {
+      "clientId": "...",
+      "clientSecret": "set DRAFTBRIDGE_GITHUB_CLIENT_SECRET instead",
+      "scope": "repo user:email"
+    },
+    "codeberg": {
+      "url": "https://codeberg.org",
+      "label": "Codeberg",
+      "clientId": "...",
+      "clientSecret": "set DRAFTBRIDGE_CODEBERG_CLIENT_SECRET instead",
+      "scope": "write:repository write:user"
+    }
+  },
+
+  "proxy": { "maxBodyMb": 100, "timeoutSeconds": 300 },
+  "staticCacheSeconds": 60
+}

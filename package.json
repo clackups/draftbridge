@@ -1,0 +1,33 @@
+{
+  "name": "draftbridge",
+  "version": "0.1.0",
+  "description": "Synchronize a Draftling over USB serial (Kermit) with a Git repository from the web browser",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "node dist/server/main.js",
+    "dev": "node scripts/build-client.ts && node src/server/main.ts",
+    "build": "tsc -p tsconfig.json && node scripts/build-client.ts --minify",
+    "build-client": "node scripts/build-client.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test --test-concurrency=1 test/*.test.ts",
+    "check-ascii": "node scripts/check-ascii.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "hono": "^4.13.13",
+    "pako": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
+}
