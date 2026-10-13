@@ -15,7 +15,10 @@ How it works
    offending files.
 2. On the Draftling: F1 -> "Sync via browser" -> Start. The device
    becomes a Kermit file server on its USB serial port; the browser
-   connects to it with the Web Serial API (Chrome, Edge, Opera).
+   connects to it with the Web Serial API (Chrome, Edge, Opera). On
+   opening the port it releases DTR and RTS (RTS first), so boards whose
+   USB-to-UART bridge drives the ESP32's reset and boot pins (the Seeed
+   reTerminal) keep running; see [docs/kermit.md](docs/kermit.md).
 3. Synchronize: the browser performs the steps Draftling's own Git sync
    performs over WiFi -- commit the documents, fetch, fast-forward or
    rebase with a per-line merge (conflicts are committed with markers),

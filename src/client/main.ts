@@ -283,7 +283,8 @@ function renderDevice(): void {
     replace(sections.device, head,
       flash('error', d.error ?? 'The Draftling does not answer.'),
       howto,
-      h('div.toolbar', h('button.btn', { type: 'button', onclick: () => void probe() }, 'Try again'), disconnect));
+      h('div.toolbar', h('button.btn', { type: 'button', onclick: () => void probe() }, 'Try again'), disconnect),
+      transferLog());
     return;
   }
   const c = d.config;
@@ -304,6 +305,7 @@ async function connect(baud: number): Promise<void> {
     renderDevice();
     return;
   }
+  state.kermitLog = [...channel.signalLog];
   const client = new KermitClient(channel, {
     timeoutMs: KERMIT_TIMEOUT_MS,
     retries: KERMIT_RETRIES,
@@ -415,7 +417,12 @@ function progressView(): HTMLElement | null {
   if (!s.progress.length) return null;
   return h('div.progress',
     h('ol.steps', s.progress.map((p, i) => h('li' + (i === s.progress.length - 1 && s.syncing ? '.current' : ''), p))),
-    s.kermitLog.length ? h('details.small', h('summary', 'Transfer details'), h('pre', s.kermitLog.slice(-50).join('\n'))) : null);
+    transferLog());
+}
+
+function transferLog(): HTMLElement | null {
+  const log = state.kermitLog;
+  return log.length ? h('details.small', h('summary', 'Transfer details'), h('pre', log.slice(-50).join('\n'))) : null;
 }
 
 function resultView(): HTMLElement | null {
@@ -459,7 +466,7 @@ async function runSync(): Promise<void> {
   }
   s.syncing = true;
   s.progress = [];
-  s.kermitLog = [];
+  s.kermitLog = [...d.channel.signalLog];
   s.result = null;
   s.syncError = null;
   s.unsupported = [];
