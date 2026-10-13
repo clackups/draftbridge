@@ -5,6 +5,9 @@ Synchronize a [Draftling](https://github.com/clackups/draftling) with a
 Git repository on GitHub or Codeberg through a USB cable, from a web
 browser, without WiFi. See [AGENTS.md](AGENTS.md) for the outline.
 
+Draftbridge is not compatible with the Sticky, CrowPanel and Tab5
+versions of the Draftling.
+
 How it works
 ------------
 

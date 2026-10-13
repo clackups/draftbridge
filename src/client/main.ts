@@ -94,6 +94,7 @@ function renderLanding(error: string | null): void {
         h('li', 'Log in and choose the repository for your documents, or create a new one.'),
         h('li', 'Connect the Draftling to this computer with a USB cable. On the Draftling, press F1, choose "Sync via browser" and Start.'),
         h('li', 'Click Synchronize. Your documents travel between the Draftling and the repository the same way as with Git sync over WiFi: every version is kept, and edits made on both sides are merged.')),
+      h('p', 'Draftbridge is not compatible with the Sticky, CrowPanel and Tab5 versions of the Draftling.'),
       h('p.muted.small', 'Draftbridge keeps nothing on its server: your login stays in this browser tab, and your documents only pass through on their way to the Git host.')));
 }
 
