@@ -29,6 +29,6 @@ function wrap(get: () => Storage): { get(k: string): string | null; set(k: strin
 export const storage = {
   // This tab only, survives reloads: login tokens.
   session: wrap(() => sessionStorage),
-  // Preferences: last repository, serial speed.
+  // Preferences: last repository.
   local: wrap(() => localStorage),
 };

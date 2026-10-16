@@ -94,7 +94,7 @@ function renderLanding(error: string | null): void {
         h('li', 'Log in and choose the repository for your documents, or create a new one.'),
         h('li', 'Connect the Draftling to this computer with a USB cable. On the Draftling, press F1, choose "Sync via browser" and Start.'),
         h('li', 'Click Synchronize. Your documents travel between the Draftling and the repository the same way as with Git sync over WiFi: every version is kept, and edits made on both sides are merged.')),
-      h('p', 'Draftbridge is not compatible with the Sticky, CrowPanel and Tab5 versions of the Draftling.'),
+      h('p', 'Supported boards: Xteink X4 Pro and X4 Classic, LilyGO T5 E-Paper S3 Pro / Pro Lite / H752, M5Stack PaperS3 and PaperMono, Waveshare ESP32-S3-ePaper-3.97, ESP32-S3-RLCD-4.2, ESP32-S3-Touch-LCD-7, ESP32-S3-Touch-LCD-3.49 and ESP32-S3-LCD-3.16, the Freenove FNK0104 boards, and the Viewe UEDX24320028E-WB-A. Other boards (such as the Seeed reTerminal, Elecrow CrowPanel and M5Stack Tab5) do not offer "Sync via browser".'),
       h('p.muted.small', 'Draftbridge keeps nothing on its server: your login stays in this browser tab, and your documents only pass through on their way to the Git host.')));
 }
 
@@ -250,8 +250,10 @@ async function createRepo(name: string, isPrivate: boolean): Promise<void> {
 // the SD card is busy.
 const KERMIT_TIMEOUT_MS = 6000;
 const KERMIT_RETRIES = 5;
-
-const BAUD_RATES = [115200, 230400, 460800, 921600, 57600, 9600];
+// The I packet that starts every command is answered at once: give up
+// after 3 s when the server is gone (stopped on the device).
+const KERMIT_INIT_TIMEOUT_MS = 1000;
+const KERMIT_INIT_RETRIES = 2;
 
 function renderDevice(): void {
   const d = state.device;
@@ -259,20 +261,15 @@ function renderDevice(): void {
   const howto = h('ol.small',
     h('li', 'Connect the Draftling to this computer with a USB cable.'),
     h('li', 'On the Draftling, press F1, choose "Sync via browser" (V) and then Start. The status bar shows "Sync via browser active".'),
-    h('li', 'Click Connect and pick the Draftling\'s serial port (on Linux /dev/ttyACM0 or /dev/ttyUSB0, on macOS usbmodem or usbserial, on Windows a COM port).'));
+    h('li', 'Click Connect and pick the Draftling\'s serial port (on Linux /dev/ttyACM0, on macOS usbmodem, on Windows a COM port).'));
   if (!webSerial()) {
     replace(sections.device, head, h('div.warning', 'This browser cannot talk to USB serial devices. Please use Chrome, Edge or Opera on a computer.'));
     return;
   }
   if (!d || d.status === 'closed') {
-    const saved = Number(storage.local.get('draftbridge.baud')) || 115200;
-    const baud = h('select', { 'aria-label': 'Speed' }, BAUD_RATES.map((b) => h('option', { value: b, selected: b === saved }, `${b} bit/s`))) as HTMLSelectElement;
     replace(sections.device, head, howto,
       d?.error ? flash('error', d.error) : null,
-      h('div.row',
-        h('label', 'Speed', baud),
-        h('div', h('button.btn', { type: 'button', onclick: () => void connect(Number(baud.value)) }, 'Connect'))),
-      h('p.muted.small', 'The speed only matters for boards with a USB-to-serial chip (such as the Seeed reTerminal); 115200 is right for them.'));
+      h('div.toolbar', h('button.btn', { type: 'button', onclick: () => void connect() }, 'Connect')));
     return;
   }
   const disconnect = state.syncing ? null : h('button.btn.btn-secondary.btn-small', { type: 'button', onclick: () => void disconnectDevice() }, 'Disconnect');
@@ -295,21 +292,25 @@ function renderDevice(): void {
       ' ', disconnect));
 }
 
-async function connect(baud: number): Promise<void> {
-  storage.local.set('draftbridge.baud', String(baud));
+async function connect(): Promise<void> {
+  // A previous connection that failed or was lost: release its port
+  // before the picker may hand back the same one.
+  await state.device?.channel?.close();
   let channel: SerialChannel;
   try {
-    channel = await SerialChannel.request(baud);
+    channel = await SerialChannel.request();
   } catch (err) {
     if (err instanceof DOMException && err.name === 'NotFoundError') return; // the user closed the port picker
     state.device = { status: 'closed', error: `The serial port could not be opened: ${message(err)}`, channel: null!, client: null!, configText: null, config: null };
     renderDevice();
     return;
   }
-  state.kermitLog = [...channel.signalLog];
+  state.kermitLog = [];
   const client = new KermitClient(channel, {
     timeoutMs: KERMIT_TIMEOUT_MS,
     retries: KERMIT_RETRIES,
+    initTimeoutMs: KERMIT_INIT_TIMEOUT_MS,
+    initRetries: KERMIT_INIT_RETRIES,
     log: (line) => {
       state.kermitLog.push(line);
       if (state.kermitLog.length > 200) state.kermitLog.shift();
@@ -467,7 +468,7 @@ async function runSync(): Promise<void> {
   }
   s.syncing = true;
   s.progress = [];
-  s.kermitLog = [...d.channel.signalLog];
+  s.kermitLog = [];
   s.result = null;
   s.syncError = null;
   s.unsupported = [];

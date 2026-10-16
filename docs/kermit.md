@@ -18,19 +18,11 @@ themselves.
 Link and packets
 ----------------
 
-* 8 data bits, no parity, no flow control; 115200 bit/s for boards with
-  a USB-to-UART chip (the speed does not matter on the ESP32-S3's
-  native USB port).
-* Modem control lines: right after opening the port, Draftbridge drops
-  RTS and then DTR. On boards with a USB-to-UART bridge (the Seeed
-  reTerminal's CH343) these lines drive the ESP32's EN and GPIO0
-  through esptool's auto-reset circuit: RTS alone resets the chip, DTR
-  alone selects the bootloader, both or neither leave it running. The
-  port opens with both asserted, and dropping RTS first passes only
-  through "DTR alone" (no reset) to "neither", the state idf.py monitor
-  and esptool's `no_reset` use. Draftbridge then waits 100 ms before
-  the first packet. The line changes (and the input lines, as far as
-  the browser reports them) are at the top of "Transfer details".
+* 8 data bits, no parity, no flow control. Draftbridge supports only
+  boards whose console is the ESP32-S3's native USB port (the boards
+  listed in the [README](../README.md)), not boards with a USB-to-UART
+  bridge. The native port ignores the line speed (the port is opened
+  at 115200 bit/s) and the modem control lines.
 * Stop-and-wait (no sliding windows). Draftbridge offers block check
   type 3 (CRC-16), repeat-count prefix `~`, long packets (up to 9024
   bytes; Draftling offers 9000), control prefix `#`, and agrees to

@@ -153,3 +153,17 @@ test('transfers survive corrupted and lost packets', async () => {
   assert.equal((await client.dir(''))!.length, 1);
   server.stop();
 });
+
+test('a command to a server that is gone fails after the I packet timeout', async () => {
+  const [a] = memoryPipe(); // nobody serves the other end
+  const sent: string[] = [];
+  const client = new KermitClient(a, {
+    timeoutMs: 5000, retries: 5, initTimeoutMs: 100, initRetries: 2,
+    log: (line) => sent.push(line),
+  });
+  const t0 = Date.now();
+  await assert.rejects(client.dir(''), /no response to I packet/);
+  const elapsed = Date.now() - t0;
+  assert.ok(elapsed >= 250 && elapsed < 1000, `gave up after ${elapsed} ms`);
+  assert.equal(sent.filter((l) => l === 'resend I#0').length, 3);
+});

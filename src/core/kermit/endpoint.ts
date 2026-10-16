@@ -27,6 +27,11 @@ export interface EndpointOptions {
   // How long to wait for a packet before resending / NAKing.
   timeoutMs?: number;
   retries?: number;
+  // The same for the I packet that starts every client command. The
+  // server answers it at once, so a short wait tells quickly that the
+  // server is gone. Default: timeoutMs and retries.
+  initTimeoutMs?: number;
+  initRetries?: number;
   // Longest long packet we accept.
   maxlx?: number;
   log?: (line: string) => void;
@@ -47,6 +52,8 @@ export class Endpoint {
   protected parser = new PacketParser();
   protected timeoutMs: number;
   protected retries: number;
+  protected initTimeoutMs: number | undefined;
+  protected initRetries: number | undefined;
   protected mine: Params;
   protected log: (line: string) => void;
   // Settings of the last parameter negotiation (I or S exchange).
@@ -56,6 +63,8 @@ export class Endpoint {
     this.ch = ch;
     this.timeoutMs = opts.timeoutMs ?? 5000;
     this.retries = opts.retries ?? 8;
+    this.initTimeoutMs = opts.initTimeoutMs;
+    this.initRetries = opts.initRetries;
     this.mine = localParams(opts.maxlx ?? 9024);
     this.log = opts.log ?? (() => {});
   }
@@ -92,11 +101,12 @@ export class Endpoint {
   // on timeouts, damaged replies and NAKs. A NAK for the next packet
   // counts as an ACK.
   protected async exchange(seq: number, type: string, data: Uint8Array, chkt: CheckType,
-    accept: (p: Packet) => boolean, replyChkts: CheckType[] = [chkt]): Promise<Packet> {
-    for (let attempt = 0; attempt <= this.retries; attempt++) {
+    accept: (p: Packet) => boolean, replyChkts: CheckType[] = [chkt],
+    timeoutMs = this.timeoutMs, retries = this.retries): Promise<Packet> {
+    for (let attempt = 0; attempt <= retries; attempt++) {
       await this.sendPacket(seq, type, data, chkt);
       for (;;) {
-        const r = await this.receive(replyChkts);
+        const r = await this.receive(replyChkts, timeoutMs);
         if (r === null || r === 'bad') break;
         if (r.type === 'E') throw new KermitRemoteError(new TextDecoder().decode(decodeData(r.data, DEFAULT_SESSION)) || 'error');
         if (accept(r)) return r;

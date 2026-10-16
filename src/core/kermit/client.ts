@@ -48,7 +48,8 @@ export class KermitClient extends Endpoint {
 
   private async init(): Promise<void> {
     this.parser.clear();
-    const r = await this.exchange(0, 'I', encodeParams(this.mine), 1, (p) => p.type === 'Y' && p.seq === 0, KermitClient.CMD_CHECKS);
+    const r = await this.exchange(0, 'I', encodeParams(this.mine), 1, (p) => p.type === 'Y' && p.seq === 0, KermitClient.CMD_CHECKS,
+      this.initTimeoutMs ?? this.timeoutMs, this.initRetries ?? this.retries);
     this.session = negotiate(this.mine, decodeParams(r.data));
   }
 

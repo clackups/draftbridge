@@ -5,8 +5,20 @@ Synchronize a [Draftling](https://github.com/clackups/draftling) with a
 Git repository on GitHub or Codeberg through a USB cable, from a web
 browser, without WiFi. See [AGENTS.md](AGENTS.md) for the outline.
 
-Draftbridge is not compatible with the Sticky, CrowPanel and Tab5
-versions of the Draftling.
+Supported boards: those whose USB port is the ESP32-S3's native USB
+(the boards that offer "SD card via USB" in Draftling):
+
+* Xteink X4 Pro and X4 Classic
+* LilyGO T5 E-Paper S3 Pro / Pro Lite / H752
+* M5Stack PaperS3 and PaperMono
+* Waveshare ESP32-S3-ePaper-3.97, ESP32-S3-RLCD-4.2,
+  ESP32-S3-Touch-LCD-7, ESP32-S3-Touch-LCD-3.49 and ESP32-S3-LCD-3.16
+* Freenove FNK0104 boards (2.8", 3.5" and 4")
+* Viewe UEDX24320028E-WB-A
+
+Other boards, such as the Seeed reTerminal E1001 and Sticky, the
+Elecrow CrowPanel and the M5Stack Tab5, do not offer "Sync via
+browser".
 
 How it works
 ------------
@@ -18,10 +30,8 @@ How it works
    offending files.
 2. On the Draftling: F1 -> "Sync via browser" -> Start. The device
    becomes a Kermit file server on its USB serial port; the browser
-   connects to it with the Web Serial API (Chrome, Edge, Opera). On
-   opening the port it releases DTR and RTS (RTS first), so boards whose
-   USB-to-UART bridge drives the ESP32's reset and boot pins (the Seeed
-   reTerminal) keep running; see [docs/kermit.md](docs/kermit.md).
+   connects to it with the Web Serial API (Chrome, Edge, Opera); see
+   [docs/kermit.md](docs/kermit.md).
 3. Synchronize: the browser performs the steps Draftling's own Git sync
    performs over WiFi -- commit the documents, fetch, fast-forward or
    rebase with a per-line merge (conflicts are committed with markers),
@@ -36,7 +46,7 @@ authorization codes for tokens (that needs the client secret) and
 forwards the browser's requests to the Git host (Git hosts do not
 accept cross-origin requests from browsers). It stores nothing: the
 login lives in the browser tab's session storage, preferences (last
-repository, serial speed) in local storage.
+repository) in local storage.
 
 [docs/kermit.md](docs/kermit.md) describes the Kermit side.
 
