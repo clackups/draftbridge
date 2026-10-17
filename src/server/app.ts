@@ -8,7 +8,7 @@
 import { Hono, type Context } from 'hono';
 import type { Config } from './config.ts';
 import { buildProviders, type Provider } from './providers.ts';
-import { appPage } from './page.ts';
+import { appPage, privacyPage } from './page.ts';
 import { registerStaticRoutes } from './static.ts';
 
 const FORWARDED_RESPONSE_HEADERS = ['content-type', 'link', 'x-total-count', 'x-hasmore', 'www-authenticate'];
@@ -47,6 +47,7 @@ export function createApp(cfg: Config, fetchFn: typeof fetch = fetch): Hono {
 
   app.get('/', (c) => c.html(appPage(cfg, providers)));
   app.get('/auth/:provider/callback', (c) => (provider(c) ? c.html(appPage(cfg, providers)) : c.notFound()));
+  app.get('/privacy', (c) => c.html(privacyPage(cfg)));
   app.get('/healthz', (c) => c.text('ok'));
 
   // OAuth: the browser obtained a code (with PKCE); exchange it here,

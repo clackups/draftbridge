@@ -5,6 +5,8 @@ Synchronize a [Draftling](https://github.com/clackups/draftling) with a
 Git repository on GitHub or Codeberg through a USB cable, from a web
 browser, without WiFi. See [AGENTS.md](AGENTS.md) for the outline.
 
+Draftling firmware 1.0.17 or newer is supported.
+
 Supported boards: those whose USB port is the ESP32-S3's native USB
 (the boards that offer "SD card via USB" in Draftling):
 

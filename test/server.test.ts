@@ -43,6 +43,17 @@ test('the page embeds the public provider settings only', async () => {
   assert.equal((await app.request('/static/../config.ts')).status, 404);
 });
 
+test('privacy statement is served and linked in the footer', async () => {
+  const app = createApp(config());
+  assert.match(await (await app.request('/')).text(), /<a href="\/privacy">Privacy<\/a>/);
+  const res = await app.request('/privacy');
+  assert.equal(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /<h1>Privacy statement<\/h1>/);
+  assert.match(html, /does not store your documents/);
+  assert.doesNotMatch(html, /app\.js/);
+});
+
 test('token exchange forwards the code with the client secret', async () => {
   const calls: Array<{ url: string; body: string }> = [];
   const fake = (async (url: string, init: RequestInit) => {

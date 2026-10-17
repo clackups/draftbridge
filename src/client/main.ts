@@ -94,7 +94,15 @@ function renderLanding(error: string | null): void {
         h('li', 'Log in and choose the repository for your documents, or create a new one.'),
         h('li', 'Connect the Draftling to this computer with a USB cable. On the Draftling, press F1, choose "Sync via browser" and Start.'),
         h('li', 'Click Synchronize. Your documents travel between the Draftling and the repository the same way as with Git sync over WiFi: every version is kept, and edits made on both sides are merged.')),
-      h('p', 'Supported boards: Xteink X4 Pro and X4 Classic, LilyGO T5 E-Paper S3 Pro / Pro Lite / H752, M5Stack PaperS3 and PaperMono, Waveshare ESP32-S3-ePaper-3.97, ESP32-S3-RLCD-4.2, ESP32-S3-Touch-LCD-7, ESP32-S3-Touch-LCD-3.49 and ESP32-S3-LCD-3.16, the Freenove FNK0104 boards, and the Viewe UEDX24320028E-WB-A. Other boards (such as the Seeed reTerminal, Elecrow CrowPanel and M5Stack Tab5) do not offer "Sync via browser".'),
+      h('p', 'Draftling firmware 1.0.17 or newer is supported. Supported boards:'),
+      h('ul',
+        h('li', 'Xteink X4 Pro and X4 Classic'),
+        h('li', 'LilyGO T5 E-Paper S3 Pro / Pro Lite / H752'),
+        h('li', 'M5Stack PaperS3 and PaperMono'),
+        h('li', 'Waveshare ESP32-S3-ePaper-3.97, ESP32-S3-RLCD-4.2, ESP32-S3-Touch-LCD-7, ESP32-S3-Touch-LCD-3.49 and ESP32-S3-LCD-3.16'),
+        h('li', 'Freenove FNK0104 boards (2.8", 3.5" and 4")'),
+        h('li', 'Viewe UEDX24320028E-WB-A')),
+      h('p', 'Other boards (such as the Seeed reTerminal, Elecrow CrowPanel and M5Stack Tab5) do not offer "Sync via browser".'),
       h('p.muted.small', 'Draftbridge keeps nothing on its server: your login stays in this browser tab, and your documents only pass through on their way to the Git host.')));
 }
 
