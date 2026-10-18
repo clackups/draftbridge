@@ -41,7 +41,8 @@ How it works
    device keeps in `.git` on its SD card. It reads and writes that
    repository and the documents over Kermit and talks Git smart HTTP to
    the Git host. The device's `git.cfg` is pointed at the repository.
-4. On the Draftling: F1 -> "Sync via browser" -> Stop.
+4. On the Draftling: select Finished in the "Sync via browser" dialog
+   (Enter or Esc).
 
 The server is stateless: it serves the web application, swaps OAuth
 authorization codes for tokens (that needs the client secret) and

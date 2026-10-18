@@ -268,7 +268,7 @@ function renderDevice(): void {
   const head = h('div.pagehead', h('h2', '2. Draftling'));
   const howto = h('ol.small',
     h('li', 'Connect the Draftling to this computer with a USB cable.'),
-    h('li', 'On the Draftling, press F1, choose "Sync via browser" (V) and then Start. The status bar shows "Sync via browser active".'),
+    h('li', 'On the Draftling, press F1, choose "Sync via browser" (B) and then Start. The Draftling shows the "Sync via browser" dialog.'),
     h('li', 'Click Connect and pick the Draftling\'s serial port (on Linux /dev/ttyACM0, on macOS usbmodem, on Windows a COM port).'));
   if (!webSerial()) {
     replace(sections.device, head, h('div.warning', 'This browser cannot talk to USB serial devices. Please use Chrome, Edge or Opera on a computer.'));
@@ -453,7 +453,7 @@ function resultView(): HTMLElement | null {
     r.filesWritten.length || r.filesDeleted.length ? h('p.small',
       r.filesWritten.length ? `Updated on the Draftling: ${r.filesWritten.join(', ')}. ` : '',
       r.filesDeleted.length ? `Removed from the Draftling: ${r.filesDeleted.join(', ')}.` : '') : null,
-    h('p.muted', 'When you are done, press F1 on the Draftling, choose "Sync via browser" and Stop. The Draftling then shows the new files.'));
+    h('p.muted', 'When you are done, select Finished in the "Sync via browser" dialog on the Draftling (Enter or Esc). The Draftling then shows the new files.'));
 }
 
 async function runSync(): Promise<void> {
